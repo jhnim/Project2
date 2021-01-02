@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>Project2</display-name>
+  
+  
+    <!-- 
+  	서블릿 매핑(등록)하기 
+  	예제 1 : JSP파일없이 서블릿에서 즉시 내용을 출력하는 예제
+  -->
+     <servlet>
+      <servlet-name>mainServlet</servlet-name>
+      <servlet-class>controller.MainCtrl</servlet-class>
+   </servlet>
+   <servlet-mapping>
+      <servlet-name>mainServlet</servlet-name>
+      <url-pattern>/main/main.do</url-pattern>
+   </servlet-mapping>
+  
+  <!-- 컨텍스트 초기화 파라미터 : MariaDB 연결을 위한 정보 -->
+  <context-param>
+  	<param-name>MariaJDBCDriver</param-name>
+  	<param-value>org.mariadb.jdbc.Driver</param-value>
+  </context-param>
+  <context-param>
+  	<param-name>MariaConnectURL</param-name>
+  	<param-value>jdbc:mariadb://127.0.0.1:3306/kosmo_db</param-value>
+  </context-param>
+  <!-- 세션 유지시간 설정하기 : web.xml에서는 '분'단위로 설정된다. -->
+  <session-config>
+  	<session-timeout>60</session-timeout>
+  </session-config>
+  
+  <!-- 회원가입시 아이디 중복여부 검증 --> 
+  <servlet>
+    <servlet-name>mainIdCheck</servlet-name>
+    <servlet-class>controller.IdCheckCtrl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>mainIdCheck</servlet-name>
+    <url-pattern>/main/IdCheck</url-pattern>
+  </servlet-mapping>
+  
+    <!-- 회원가입매핑 --> 
+  <servlet>
+    <servlet-name>mainJoin</servlet-name>
+    <servlet-class>controller.JoinCtrl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>mainJoin</servlet-name>
+    <url-pattern>/main/Join</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 로그인검증 -->
+  <servlet>
+    <servlet-name>mainLogin</servlet-name>
+    <servlet-class>controller.LoginCtrl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>mainLogin</servlet-name>
+    <url-pattern>/main/Login</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 관리자 로그인사이트 -->
+  <servlet>
+    <servlet-name>mainAdminLogin</servlet-name>
+    <servlet-class>controller.AdminLoginCtrl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>mainAdminLogin</servlet-name>
+    <url-pattern>/admin</url-pattern>
+  </servlet-mapping>
+  
+  <context-param>
+  	<param-name>MariaUser</param-name>
+  	<param-value>kosmo_user</param-value>
+  </context-param>
+  <context-param>
+  	<param-name>MariaPass</param-name>
+  	<param-value>1234</param-value>
+  </context-param>
+  
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+</web-app>
