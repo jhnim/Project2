@@ -12,7 +12,14 @@ public class MainDTO {
     private String address;
     private java.sql.Date regidate;
     private String open_email;
-    
+    private String admin;
+       
+	public String getAdmin() {
+		return admin;
+	}
+	public void setAdmin(String admin) {
+		this.admin = admin;
+	}
 	public String getOpen_email() {
 		return open_email;
 	}

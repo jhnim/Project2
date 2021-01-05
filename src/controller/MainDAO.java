@@ -19,6 +19,7 @@ public class MainDAO {
 	Connection con;
 	PreparedStatement psmt;
 	ResultSet rs;
+	private String id;
 	
 	//기본생성자에서 DBCP(커넥션풀)을 통해 DB연결
 	public MainDAO() {
@@ -169,6 +170,9 @@ public class MainDAO {
 		}
 		return isCorr;
 	}
+	
+	
+	
 //////////////////////////////////////아이디찾기/////////////////////////////////////////////////////	
    //회원정보를 저장후 반환한다.
    public String idSearch(String name, String email) { //이름,이메일로 찾기.
@@ -306,10 +310,162 @@ public class MainDAO {
 						
 			//insert성공시 1반환, 실패시 0반환
 			affected = psmt.executeUpdate();
+			System.out.println("회원가입성공:"+affected);
 		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
 		return affected;
+	}
+
+
+/////////////////////// 회원정보 가져오기////////////////////////
+	public List<MainDTO> membershipData() {
+		
+		List<MainDTO> msd = new Vector<MainDTO>();
+		
+		String sql = "SELECT * FROM membership";
+		
+		try{
+			psmt = con.prepareStatement(sql);
+			
+			
+			rs = psmt.executeQuery();
+			
+			while(rs.next()) {
+				MainDTO dto = new MainDTO();
+				
+				dto.setName(rs.getString("name"));
+				dto.setId(rs.getString("id"));
+				dto.setMobile(rs.getString("mobile"));
+				dto.setEmail(rs.getString("email"));
+				
+				msd.add(dto);
+			}
+			
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return msd;
+	}
+	
+	////id로 회원정보 보기
+	public List<MainDTO> memberData(String id) {
+		
+		List<MainDTO> msd = new Vector<MainDTO>();
+		
+		String sql = "SELECT * FROM membership WHERE id=?";
+		
+		try{
+			psmt = con.prepareStatement(sql);
+			
+			psmt.setString(1, id);
+			
+			rs = psmt.executeQuery();
+			
+			while(rs.next()) {
+				MainDTO dto = new MainDTO();
+				
+				dto.setName(rs.getString("name"));
+				dto.setId(rs.getString("id"));
+				dto.setMobile(rs.getString("mobile"));
+				dto.setEmail(rs.getString("email"));
+				
+				msd.add(dto);
+			}
+			
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return msd;
+	}
+	
+/////////////회원상세보기
+	public MainDTO memberView(String id) {
+		
+		MainDTO dto = new MainDTO();
+		//게시판 테이블만 사용하여 게시물 조회
+		//String query = "SELECT * FROM board WHERE num=?";
+		
+		//게시판, 회원테이블을 조인하여 이름까지 가져와서 조회
+		String query = "SELECT * FROM membership WHERE id=? ";
+		
+		try {
+			psmt = con.prepareStatement(query);
+			psmt.setString(1, id);
+			rs = psmt.executeQuery();
+			
+			if(rs.next()) {
+				dto.setName(rs.getString("name"));
+				dto.setId(rs.getString("id"));
+				dto.setPass(rs.getString("pass"));
+				dto.setTel(rs.getString("tel"));
+				dto.setMobile(rs.getString("mobile"));
+				dto.setEmail(rs.getString("email"));
+				dto.setAddress(rs.getString("address"));
+				dto.setRegidate(rs.getDate("regidate"));
+				dto.setAdmin(rs.getString("admin"));
+			}
+		} catch (Exception e) {
+			System.out.println("상세보기시 예외발생");
+			e.printStackTrace();
+		}
+		
+		return dto;
+	}	
+	
+////////////////// 회원정보 수정	
+	public int memberEdit(MainDTO dto) {
+		int affected = 0;
+		
+		String query = "UPDATE membership SET pass=?, tel=?, mobile=?, email=?, address=? WHERE id=?";
+		
+		try {
+			
+			psmt = con.prepareStatement(query);
+			psmt.setString(1, dto.getPass());
+			psmt.setString(2, dto.getTel());
+			psmt.setString(3, dto.getMobile());
+			psmt.setString(4, dto.getEmail());
+			psmt.setString(5, dto.getAddress());
+			
+			psmt.setString(6, dto.getId());
+			
+			affected = psmt.executeUpdate();
+			System.out.println("회원정보수정:"+affected);
+		} catch (Exception e) {
+			System.out.println("update중  예외발생");
+			e.printStackTrace();
+		}
+		
+		return affected;
+	}
+	
+///////////////회원정보 삭제
+	//게시물 삭제처리
+		public int memberDelete(MainDTO dto) {
+			int affected = 0;
+			
+			String query = "DELETE FROM membership WHERE id=?";
+			
+			try {
+				
+				psmt = con.prepareStatement(query);
+				psmt.setString(1, dto.getId());
+				
+				affected = psmt.executeUpdate();
+				System.out.println("삭제성공:"+affected);
+			} catch (Exception e) {
+				System.out.println("delete중  예외발생");
+				e.printStackTrace();
+			}
+			
+			return affected;
+		}
+		
+	public static void main(String[] args) {
+		new MainDAO();
 	}
 }

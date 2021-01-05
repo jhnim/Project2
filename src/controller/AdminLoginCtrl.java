@@ -16,6 +16,7 @@ public class AdminLoginCtrl extends HttpServlet{
 	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
 		System.out.println("ctrl들어오냐");
 		resp.sendRedirect("./admin/adminLogin.jsp");
 	}

@@ -2,6 +2,15 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
   <display-name>Project2</display-name>
   
+	<!-- 게시판 리스트 페이지 처리 설정 -->
+  <context-param>
+  	<param-name>PAGE_SIZE</param-name>
+  	<param-value>10</param-value>
+  </context-param>
+  <context-param>
+  	<param-name>BLOCK_PAGE</param-name>
+  	<param-value>10</param-value>
+  </context-param>  
   
     <!-- 
   	서블릿 매핑(등록)하기 
@@ -49,17 +58,8 @@
     <servlet-name>mainJoin</servlet-name>
     <url-pattern>/main/Join</url-pattern>
   </servlet-mapping>
-  
-  <!-- 로그인검증 -->
-  <servlet>
-    <servlet-name>mainLogin</servlet-name>
-    <servlet-class>controller.LoginCtrl</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>mainLogin</servlet-name>
-    <url-pattern>/main/Login</url-pattern>
-  </servlet-mapping>
-  
+ 
+ 
   <!-- 관리자 로그인사이트 -->
   <servlet>
     <servlet-name>mainAdminLogin</servlet-name>
@@ -68,6 +68,16 @@
   <servlet-mapping>
     <servlet-name>mainAdminLogin</servlet-name>
     <url-pattern>/admin</url-pattern>
+  </servlet-mapping>
+
+  <!-- 관리자 회원정보 상세보기 -->
+  <servlet>
+    <servlet-name>mainAdminMemberView</servlet-name>
+    <servlet-class>controller.MemberViewCtrl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>mainAdminMemberView</servlet-name>
+    <url-pattern>/admin/MemberView</url-pattern>
   </servlet-mapping>
   
   <context-param>

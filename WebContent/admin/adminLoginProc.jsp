@@ -29,8 +29,8 @@ if(memberMap.isEmpty()==false){
 			session.setAttribute("PASS", memberMap.get("pass"));
 			session.setAttribute("NAME", memberMap.get("name"));
 		
-		 	//로그인 페이지로 이동
-			response.sendRedirect("index.jsp");
+		 	//회원테이블 페이지로 이동
+			response.sendRedirect("registTables.jsp");
 		}else{ %>
 			<head>
 				<script>

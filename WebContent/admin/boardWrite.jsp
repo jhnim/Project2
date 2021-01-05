@@ -1,15 +1,34 @@
-<%@page import="java.util.List"%>
+<%@page import="controller.BbsDTO"%>
+<%@page import="controller.BbsDAO"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="controller.BbsDAO"%>
-<%@page import="controller.BbsDTO"%>
+<%@page import="java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<%-- 글작성 페이지 진입 전 로그인 체크하기 --%>
+<%@ include file="isLogin.jsp" %>
+<script>
+/* 연습문제] 글쓰기 폼에 빈값이 있는 경우 서버로 전송되지 않도록 아래 validate()함수를 완성하시오.
+ 	모든 값이 입력되었다면 WriteProc.jsp로 submit되어야 한다.
+ */
+	function checkValidate(fm){
+	
+		if(fm.title.value==""){
+			alert("제목을 입력하세요.");
+			fm.title.focus();
+			return false;
+		}	
+		if(fm.content.value==""){
+			alert("내용을 입력하세요.");
+			fm.content.focus();
+			return false;
+		}
+	}
+</script>
 <%
 //한글처리
 request.setCharacterEncoding("UTF-8");
+
 
 //커넥션풀(DBCP)을 통한 DAO객체생성 및 DB연결 
 BbsDAO dao = new BbsDAO();
@@ -19,6 +38,11 @@ String flag = request.getParameter("flag")==null ? "notice" : request.getParamet
 
 //회원정보 출력하기.
 List<BbsDTO> bbs = dao.selectListPageSearch(flag);
+//게시물 일련번호
+String num = request.getParameter("num");
+
+//일련번호에 해당하는 게시물을 DTO객체로 반환함
+BbsDTO dto = dao.selectView(num);
 
 dao.close();
 %>
@@ -50,7 +74,7 @@ dao.close();
 
   <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
-    <a class="navbar-brand mr-1" href="index.html">관리자게시판</a>
+    <a class="navbar-brand mr-1" href="">관리자게시판</a>
 
     <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
       <i class="fas fa-bars"></i>
@@ -79,9 +103,11 @@ dao.close();
         </div>
       </li>
     </ul>
+
   </nav>
-  
+
   <div id="wrapper">
+
     <!-- Sidebar -->
     <ul class="sidebar navbar-nav">
       <li class="nav-item active">
@@ -125,119 +151,93 @@ dao.close();
         </a>
       </li>
     </ul>
-    
+
     <div id="content-wrapper">
-    
+
       <div class="container-fluid">
       
-        <!-- Breadcrumbs-->
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item">
-            <a href="#">게시판관리</a>
-          </li>
-          <li class="breadcrumb-item active">Tables</li>
-        </ol>
-        
         <!-- DataTables Example -->
         <div class="card mb-3">
           <div class="card-header">
             <i class="fas fa-table"></i>
-            Data Table Example</div>
+            공지사항</div>
           <div class="card-body">
             <div class="table-responsive">
-              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                <thead>
-                  <tr>
-                    <th>번호</th>
-                    <th>제목</th>
-                    <th>작성자</th>
-                    <th>작성일</th>
-                    <th>조회수</th>
-                    <th>첨부</th>
-                  </tr>
-                </thead>
-                <tfoot>
-                  <tr>
-                    <th>번호</th>
-                    <th>제목</th>
-                    <th>작성자</th>
-                    <th>작성일</th>
-                    <th>조회수</th>
-                    <th>첨부</th>
-                  </tr>           
-                </tfoot>
-				<tbody>
-				 <%
-				 /*  
-				 List컬렉션에 입력된 데이터가 없을때 true를 반환
-				 */
-				 if(bbs.isEmpty()){
-					 //게시물이 없는 경우
-				 %>
-				 	<tr>
-				 		<td colspan="5" align="center">
-				 			등록된 게시물이 없습니다^^*
-				 		</td>
-				 	</tr>
-				 <%}else {				 
-				 /*
-				 컬렉션에 입력된 데이터가 있다면 저장된 BbsDTO의 갯수만큼 
-				 즉, DB가 반환해준 레코드의 갯수만큼 반복하면서 출력한다. (페이지 처리 없을때의 방식)
-				 */
-				 for(BbsDTO dto : bbs){
-				 %>
-				 <!-- 리스트반복 start -->
-				 <tr>
-				 	<td class="text-center">
-				 		<%=dto.getNum() %>
-				 	</td>
-				 	<td>
-				 		<a href="boardView.jsp?num=<%=dto.getNum()%>"><%=dto.getTitle() %>
-				 		</a>
-				 	</td>
-				 	<td class="text-center"><%=dto.getName()%><br/>(<%=dto.getId() %>)</td>
-				 	<td class="text-center"><%=dto.getPostdate() %></td>
-				 	<td class="text-center"><%=dto.getVisitcount() %></td>
-				 	<td class="text-center"><%=dto.getAttachedfile() %>
-				 		<i class="material-icons" style="font-size:20px">attach_file</i>
-				 	</td>
-				 </tr>
-				 <!-- 리스트반복 -->
-				<%} //for-each문 끝
-				} //if문 끝
-				 %>
-				</tbody>
-              </table>
+<div class="row mt-3 mr-1">
+            <table class="table table-bordered table-striped">
+            <form name="writeFrm" method="post" action="writeProc.jsp" 
+               onsubmit="return checkValidate(this);">
+            <colgroup>
+               <col width="20%"/>
+               <col width="*"/>
+            </colgroup>
+            <tbody>
+                <tr>
+                  <th class="text-center align-middle">작성자</th>
+                  <td>
+                     <input type="text" class="form-control"   style="width:100px;"/>
+                  </td>
+               </tr>
+               <tr>
+                  <th class="text-center" 
+                     style="vertical-align:middle;">패스워드</th>
+                  <td>
+                     <input type="password" class="form-control"
+                        style="width:200px;"/>
+                  </td>
+               </tr>
+               <tr>
+                  <th class="text-center"
+                     style="vertical-align:middle;">제목</th>
+                  <td>
+                     <input type="text" class="form-control" 
+                        name="title" />
+                  </td>
+               </tr>
+               <tr>
+                  <th class="text-center"
+                     style="vertical-align:middle;">내용</th>
+                  <td>
+                     <textarea rows="10" 
+                        class="form-control" name="content"></textarea>
+                  </td>
+               </tr>
+                <tr>
+                  <th class="text-center"
+                     style="vertical-align:middle;">첨부파일</th>
+                  <td>
+                     <input type="file" class="form-control" />
+                  </td>
+               </tr>
+            </tbody>
+            </table>
+         </div>
+         <div class="row mb-3">
+            <div class="col text-right">
+               <button type="submit" class="btn btn-danger">전송하기</button>
+               <button type="reset" class="btn btn-dark">Reset</button>
+               <button type="button" class="btn btn-warning" onclick="location.href='BoardList.jsp';">리스트보기</button>
             </div>
-            
-            <div class="row">
-				<div class="col text-right">
-					<button type="button" class="btn btn-primary"
-						onclick="location.href='boardWrite.jsp?flag=${param.flag }';">글쓰기</button>				
-            	</div>
-			</div>
-            
-          </div>
+            </form>
+         </div>
+            <!-- ### 게시판의 body 부분 end ### -->
+         </div>
+      	</div>
+        	</div>
+        	</div>
         </div>
-        
-        <p class="small text-center text-muted my-5">
-          <em>More table examples coming soon...</em>
-        </p>
-        
       </div>
       <!-- /.container-fluid -->
-      
     </div>
     <!-- /.content-wrapper -->
-    
   </div>
   <!-- /#wrapper -->
-  
+
   <!-- Scroll to Top Button-->
   <a class="scroll-to-top rounded" href="#page-top">
     <i class="fas fa-angle-up"></i>
   </a>
-  
+
   <!-- Logout Modal-->
   <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -256,24 +256,24 @@ dao.close();
       </div>
     </div>
   </div>
-  
+
   <!-- Bootstrap core JavaScript-->
   <script src="vendor/jquery/jquery.min.js"></script>
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  
+
   <!-- Core plugin JavaScript-->
   <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-  
+
   <!-- Page level plugin JavaScript-->
   <script src="vendor/datatables/jquery.dataTables.js"></script>
   <script src="vendor/datatables/dataTables.bootstrap4.js"></script>
-  
+
   <!-- Custom scripts for all pages-->
   <script src="js/sb-admin.min.js"></script>
-  
+
   <!-- Demo scripts for this page-->
   <script src="js/demo/datatables-demo.js"></script>
-  
+
 </body>
 
 </html>

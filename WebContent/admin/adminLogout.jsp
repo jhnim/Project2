@@ -16,6 +16,6 @@
 	//세션영역 전체를 한꺼번에 삭제
 	session.invalidate();
 	
-	response.sendRedirect("index.jsp");
+	response.sendRedirect("adminLogin.jsp");
 %>
 </body>
